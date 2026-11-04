@@ -33,7 +33,7 @@ let
         purifierSrc = builtins.storePath "${purifierSrc}";
       };
       lockFile = builtins.toPath lockPath;
-      src = builtins.path {
+      src = if target == "environment" then builtins.toPath projectPath else builtins.path {
         path = builtins.toPath projectPath;
         name = "freecad-project";
         filter = path: type: !(builtins.elem (baseNameOf path) [ ".git" ".freecad-purifier" "__pycache__" "result" ]);

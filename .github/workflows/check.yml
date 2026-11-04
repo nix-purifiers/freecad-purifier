@@ -26,6 +26,7 @@ jobs:
       - run: nix build .#freecad --out-link result-freecad
       - run: nix build .#xvfb --out-link result-xvfb
       - run: nix build .#gui-test-env --out-link result-gui-env
+      - run: python3 tests/dependency-environment.py result-cli
       - run: python3 tests/native.py result-cli result-freecad
       - run: python3 tests/gui.py result-cli result-xvfb result-gui-env
       - run: python3 tests/artifacts.py result-cli result-freecad
