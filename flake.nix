@@ -42,6 +42,23 @@
           default = p.cli;
           freecad = p.original;
           xvfb = (pkgsFor system).xvfb-run;
+          gui-test-env =
+            let
+              pkgs = pkgsFor system;
+            in
+            pkgs.runCommand "purifier-gui-test-environment" { } ''
+              mkdir -p "$out/bin"
+              ln -s ${pkgs.lib.getBin pkgs.dbus}/bin/dbus-run-session "$out/bin/dbus-run-session"
+              ln -s ${pkgs.lib.getBin pkgs.dbus}/bin/dbus-daemon "$out/bin/dbus-daemon"
+              ln -s ${
+                pkgs.makeFontsConf {
+                  fontDirectories = [
+                    pkgs.dejavu_fonts
+                    pkgs.noto-fonts
+                  ];
+                }
+              } "$out/fonts.conf"
+            '';
         }
       );
       apps = forAll (system: {
