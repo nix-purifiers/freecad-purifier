@@ -1,0 +1,9 @@
+{
+  "name": "freecad",
+  "builder": "Freecad",
+  "roots": {
+    "bolt.brep": "bolt.brep",
+    "geometry.json": "geometry.json"
+  },
+  "changedFile": "build.py"
+}

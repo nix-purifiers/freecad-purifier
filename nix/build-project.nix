@@ -1,5 +1,6 @@
 {
   lib,
+  purifier,
   runCommand,
   python3,
   original,
@@ -15,6 +16,8 @@
   fetchers ? { },
   doCheck ? false,
   checkCommand ? "",
+  resourceRoots ? { },
+  resourceDependencies ? [ ],
 }:
 let
   lock = readLock { inherit src lockFile; };
@@ -30,7 +33,7 @@ let
         "result"
       ]);
   };
-  project = runCommand "freecad-project" { } ''
+  builtProject = runCommand "freecad-project" { } ''
     export FREECAD_PURIFIER_ENVIRONMENT=${profile} FREECAD_PURIFIER_COMMAND_BINARY=${original}/bin/FreeCADCmd
     export FREECAD_PURIFIER_OUTPUT="$out"
     mkdir -p "$out"
@@ -41,6 +44,17 @@ let
     ${python3}/bin/python ${../native}/freecad_purifier_run_build.py
     ${lib.optionalString doCheck checkCommand}
   '';
+  projections = lib.optionalAttrs (resourceRoots != { }) (
+    purifier.resourceProjections {
+      producer = builtProject;
+      roots = resourceRoots;
+      dependencies = resourceDependencies;
+      inherit runCommand python3;
+    }
+  );
+  project = builtProject // {
+    inherit projections;
+  };
   release =
     runCommand "freecad-project-release"
       {
@@ -61,6 +75,6 @@ in
     environment = profile;
   };
   tests = project;
-  inherit release;
+  inherit release projections;
   fetches = lock.entries;
 }
